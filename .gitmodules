@@ -1,0 +1,6 @@
+[submodule "external/musicjson"]
+	path = external/musicjson
+	url = git@github.com:erikronstrom/musicjson.git
+[submodule "external/teoria"]
+	path = external/teoria
+	url = git@github.com:erikronstrom/teoria.git
