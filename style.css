@@ -1,0 +1,80 @@
+body {
+    padding: 5px;
+}
+
+#rendered {
+    position: relative;
+}
+
+#info {
+    position: fixed;
+    right: 20px;
+    top: 20px;
+    width: 250px;
+    min-height: 200px;
+    border: 1px solid black;
+    background: #FFFFF0;
+    padding: 15px;
+    display: none;
+}
+
+#info h1 {
+    font-family: sans-serif;
+    font-size: 14pt;
+    margin-top: 0;
+}
+
+div.object {
+    min-height: 20px;
+    padding: 0px;
+    display: block;
+    vertical-align: top;
+    border: 1px solid #999999;
+    white-space: nowrap;
+    position: absolute;
+    margin: -1px;
+}
+
+div.object.hovered {
+    border-color: black;
+}
+
+div.object.selected {
+    border-width: 2px;
+    margin: -2px;
+    border-color: black;
+}
+
+div.song {
+    background: #90c3d4;
+}
+
+div.audio {
+    background-color: #c390d4;
+    background-image: url('img/waveform.png');
+    background-size: 100% 100%;
+}
+
+div.notes {
+    background: #a1d490;
+}
+
+div.note {
+    background: red;
+}
+
+div.note h1 {
+    display: none;
+}
+
+div.object h1 {
+    font-size: 12px;
+    font-weight: normal;
+    padding: 0;
+    margin: 2px 0 2px 0;
+}
+
+div.object div.container {
+    position: relative;
+}
+
