@@ -1,24 +1,24 @@
-[submodule "external/musicjson"]
-	path = external/musicjson
+[submodule "node_modules/musicjson"]
+	path = node_modules/musicjson
 	url = git@github.com:erikronstrom/musicjson.git
-[submodule "external/teoria"]
-	path = external/teoria
-	url = git@github.com:erikronstrom/teoria.git
-[submodule "external/daccord"]
-	path = external/daccord
-	url = git@github.com:erikronstrom/daccord.git
-[submodule "external/scientific-notation"]
-	path = external/scientific-notation
-	url = git@github.com:erikronstrom/scientific-notation.git
-[submodule "external/helmholtz"]
-	path = external/helmholtz
-	url = git@github.com:erikronstrom/helmholtz.git
-[submodule "external/interval-coords"]
-	path = external/interval-coords
-	url = git@github.com:erikronstrom/interval-coords.git
-[submodule "external/notecoord"]
-	path = external/notecoord
-	url = git@github.com:erikronstrom/notecoord.git
-[submodule "external/accidental-value"]
-	path = external/accidental-value
+[submodule "node_modules/accidental-value"]
+	path = node_modules/accidental-value
 	url = git@github.com:erikronstrom/accidental-value.git
+[submodule "node_modules/notecoord"]
+	path = node_modules/notecoord
+	url = git@github.com:erikronstrom/notecoord.git
+[submodule "node_modules/interval-coords"]
+	path = node_modules/interval-coords
+	url = git@github.com:erikronstrom/interval-coords.git
+[submodule "node_modules/helmholtz"]
+	path = node_modules/helmholtz
+	url = git@github.com:erikronstrom/helmholtz.git
+[submodule "node_modules/scientific-notation"]
+	path = node_modules/scientific-notation
+	url = git@github.com:erikronstrom/scientific-notation.git
+[submodule "node_modules/teoria"]
+	path = node_modules/teoria
+	url = git@github.com:erikronstrom/teoria.git
+[submodule "node_modules/daccord"]
+	path = node_modules/daccord
+	url = git@github.com:erikronstrom/daccord.git
