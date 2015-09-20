@@ -1,6 +1,7 @@
-var teoria = require('teoria');
+teoria = require('teoria');
+remus = require('../index.js');
 
-var obj1 = {
+obj1 = {
   type: "Song",
   duration: [8700, 'ms'],
   contents: [
@@ -43,11 +44,11 @@ $(document).ready(function() {
   testRender();
 });
 
-function testRender() {
-  realizeTime(obj1, [4, 180]);
+window.testRender = function() {
+  remus.realizeTime(obj1, [4, 180]);
   //document.getElementById("rendered").innerHTML = render2(obj1);
-  document.getElementById('rendered').innerHTML = '';
-  document.getElementById('rendered').appendChild(render3(obj1));
+  document.getElementById('rendered').innerHTML = 'ape';
+  document.getElementById('rendered').appendChild(remus.render(obj1));
 }
 
-window.teoria = teoria;
+

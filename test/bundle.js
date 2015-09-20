@@ -1,4 +1,149 @@
 (function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){
+var Base = require('./lib/base.js');
+var Render = require('./lib/render.js');
+
+var remus = {
+  realizeTime: Base.realizeTime,
+  render: Render.render,
+};
+
+exports = module.exports = remus;
+
+},{"./lib/base.js":2,"./lib/render.js":3}],2:[function(require,module,exports){
+// Tempo is defined as [beat, bpm]
+// E.g. [4, 120] means 1/4 = 120
+
+// Time is [amount, unit], where unit can be 'ms' or 'note'
+// [430, 'ms']   ==> 430 ms
+// [8, 'note']   ==> eighth note
+
+function toMs(time, tempo = [4, 120]) {
+  if (time[1] == 'ms') return time[0];
+  wpm = tempo[1] / tempo[0];
+  if (time[1] == 'note') return 60000 / (time[0] * wpm);
+  return undefined;
+}
+
+module.exports = {
+
+  realizeTime: function(obj, tempo = [4, 120], startTime = 0, lastTime = 0) {
+    obj.startTime = obj.pos ? startTime + toMs([obj.pos[1], obj.pos[2]], tempo) : lastTime;
+    var maxEnd = 0;
+    var lastEnd = 0;
+    if (obj.contents) {
+      var row = 0;
+      for (var i = 0; i < obj.contents.length; i++) {
+        obj.contents[i].parent = obj;
+        if (obj.contents[i].pos && i > 0) row++;
+        obj.contents[i].row = row;
+        lastEnd = this.realizeTime(obj.contents[i], tempo, obj.startTime, lastEnd);
+        if (lastEnd > maxEnd) maxEnd = lastEnd;
+      }
+    }
+    if (obj.duration) obj.endTime = obj.startTime + toMs(obj.duration, tempo);
+    else obj.endTime = obj.startTime + maxEnd;
+    return obj.endTime - startTime;
+  },
+
+  removeObj: function(obj) {
+    if (obj.parent) {
+      obj.parent.contents = obj.parent.contents.filter(function(x) { return x != obj });
+    } else {
+      alert("Cannot remove root!");
+    }
+  },
+
+  objToString: function(obj, type) {
+    var s = [];
+    if (type) s.push(obj.type);
+    s.push("Position: " + (obj.pos ? (obj.pos[1] + ' ' + obj.pos[2]) : '--'));
+    s.push("Duration: " + (obj.duration ? (obj.duration[0] + ' ' + obj.duration[1]) : '--'));
+    var ignore = ["type", "contents", "duration", "pos", "parent"];
+    for (p in obj) {
+      if (obj.hasOwnProperty(p) && (ignore.indexOf(p) < 0)) s.push(p + ': ' + obj[p]);
+    }
+    return s.join("\n");
+  }
+}
+},{}],3:[function(require,module,exports){
+var Base = require('./base.js');
+
+function createTitle(title) {
+  var wrapper = document.createElement('h1');
+  var textNode = document.createTextNode(title);
+  wrapper.appendChild(textNode);
+  return wrapper;
+}
+
+function updateInfoField(obj) {
+  $('#info h1').text(obj.type);
+  $('#info pre').text(Base.objToString(obj));
+  document.getElementById('info').style.display = 'block';
+}
+
+var hovered;
+var selected;
+
+function render(obj) {
+  var node = document.createElement('div');
+  node.appendChild(createTitle(obj.type));
+  node.className = "object " + obj.type.toLowerCase();
+  node.style.left = (obj.startTime / 10) + 'px';
+  node.style.width = ((obj.endTime - obj.startTime) / 10) + 'px';
+  node.style.top = (obj.row ? obj.row * 40 : 0) + 'px';
+  node.dataset.row = obj.row;
+  node.obj = obj;
+  node.title = Base.objToString(obj); // JSON.stringify(obj, null, 4);
+  
+  node.onclick = function(e) {
+    updateInfoField(node.obj);
+    if (selected) $(selected).removeClass("selected");
+    selected = node;
+    $(node).addClass("selected");
+    e.stopPropagation();
+  }
+  
+  node.onmouseover = function(e) {
+    if (hovered && (hovered != node)) $(hovered).removeClass('hovered');
+    $(node).addClass('hovered');
+    hovered = node;
+    e.stopPropagation();
+  }
+  
+  node.onmouseout = function(e) {
+    if (node == hovered) $(node).removeClass('hovered');
+    hovered = null;
+  }
+  
+  var height = 0;
+  if (obj.contents) {
+    var container = document.createElement('div');
+    container.className = 'container';
+    for (var i = 0; i < obj.contents.length; i++) {
+      var child = obj.contents[i];
+      var childNode = this.render(child);
+      container.appendChild(childNode);
+      var h = parseInt(childNode.style.top) + parseInt(childNode.style.height) + 5;
+      if (h > height) height = h;
+    }
+    height += 25;
+    if (height < 30) height = 30;
+    container.style.height = height + 'px';
+    node.appendChild(container);
+    node.style.height = container.style.height;
+  } else {
+    node.style.height = '20px';
+  }
+  
+  return node;
+}
+
+module.exports = {
+  render: render
+}
+
+
+},{"./base.js":2}],4:[function(require,module,exports){
 var accidentalValues = {
   'bb': -2,
   'b': -1,
@@ -16,7 +161,7 @@ module.exports.interval = function accidentalInterval(acc) {
   return [-4 * val, 7 * val];
 }
 
-},{}],2:[function(require,module,exports){
+},{}],5:[function(require,module,exports){
 var SYMBOLS = {
   'm': ['m3', 'P5'],
   'mi': ['m3', 'P5'],
@@ -206,7 +351,7 @@ module.exports = function(symbol) {
   return notes.slice(0, chordLength + 1).concat(additionals);
 }
 
-},{}],3:[function(require,module,exports){
+},{}],6:[function(require,module,exports){
 var coords = require('notecoord');
 var accval = require('accidental-value');
 
@@ -249,7 +394,7 @@ module.exports = function helmholtz(name) {
   return coord;
 };
 
-},{"accidental-value":1,"notecoord":5}],4:[function(require,module,exports){
+},{"accidental-value":4,"notecoord":8}],7:[function(require,module,exports){
 var pattern = /^(AA|A|P|M|m|d|dd)(-?\d+)$/;
 
 // The interval it takes to raise a note a semitone
@@ -299,7 +444,7 @@ module.exports = function(simple) {
 // Copy to avoid overwriting internal base intervals
 module.exports.coords = baseIntervals.slice(0);
 
-},{}],5:[function(require,module,exports){
+},{}],8:[function(require,module,exports){
 // First coord is octaves, second is fifths. Distances are relative to c
 var notes = {
   c: [0, 0],
@@ -320,8 +465,7 @@ module.exports.notes = notes;
 module.exports.A4 = [3, 3]; // Relative to C0 (scientic notation, ~16.35Hz)
 module.exports.sharp = [-4, 7];
 
-
-},{}],6:[function(require,module,exports){
+},{}],9:[function(require,module,exports){
 var coords = require('notecoord');
 var accval = require('accidental-value');
 
@@ -345,7 +489,7 @@ module.exports = function scientific(name) {
   return coord;
 };
 
-},{"accidental-value":1,"notecoord":5}],7:[function(require,module,exports){
+},{"accidental-value":4,"notecoord":8}],10:[function(require,module,exports){
 var Note = require('./lib/note');
 var Interval = require('./lib/interval');
 var Chord = require('./lib/chord');
@@ -424,7 +568,7 @@ var teoria = {
 require('./lib/sugar')(teoria);
 exports = module.exports = teoria;
 
-},{"./lib/chord":8,"./lib/interval":9,"./lib/note":11,"./lib/scale":12,"./lib/sugar":13}],8:[function(require,module,exports){
+},{"./lib/chord":11,"./lib/interval":12,"./lib/note":14,"./lib/scale":15,"./lib/sugar":16}],11:[function(require,module,exports){
 var daccord = require('daccord');
 var knowledge = require('./knowledge');
 var Note = require('./note');
@@ -651,7 +795,7 @@ Chord.prototype = {
 
 module.exports = Chord;
 
-},{"./interval":9,"./knowledge":10,"./note":11,"daccord":2}],9:[function(require,module,exports){
+},{"./interval":12,"./knowledge":13,"./note":14,"daccord":5}],12:[function(require,module,exports){
 var knowledge = require('./knowledge');
 var vector = require('./vector');
 var toCoord = require('interval-coords');
@@ -819,29 +963,29 @@ Interval.invert = function(sInterval) {
 
 module.exports = Interval;
 
-},{"./knowledge":10,"./vector":14,"interval-coords":4}],10:[function(require,module,exports){
+},{"./knowledge":13,"./vector":17,"interval-coords":7}],13:[function(require,module,exports){
 // Note coordinates [octave, fifth] relative to C
 module.exports = {
   notes: {
     c: [0, 0],
-    d: [1, 2],
-    e: [2, 4],
-    f: [3, 5],
-    g: [4, 7],
-    a: [5, 9],
-    b: [6, 11],
-    h: [6, 11]
+    d: [-1, 2],
+    e: [-2, 4],
+    f: [1, -1],
+    g: [0, 1],
+    a: [-1, 3],
+    b: [-2, 5],
+    h: [-2, 5]
   },
 
   intervals: {
     unison: [0, 0],
-    second: [1, 1],
-    third: [2, 3],
-    fourth: [3, 5],
-    fifth: [4, 7],
-    sixth: [5, 8],
-    seventh: [6, 10],
-    octave: [7, 12]
+    second: [3, -5],
+    third: [2, -3],
+    fourth: [1, -1],
+    fifth: [0, 1],
+    sixth: [3, -4],
+    seventh: [2, -2],
+    octave: [1, 0]
   },
 
   intervalFromFifth: ['second', 'sixth', 'third', 'seventh', 'fourth',
@@ -854,16 +998,10 @@ module.exports = {
 
 // linaer index to fifth = (2 * index + 1) % 7
   fifths: ['f', 'c', 'g', 'd', 'a', 'e', 'b'],
-  noteNames: ['c', 'd', 'e', 'f', 'g', 'a', 'b'],
   accidentals: ['bb', 'b', '', '#', 'x'],
 
-  sharp: [0, 1],
-  // C0: [0, 0],
-  // C1: [7, 12],
-  // C2: [14, 24],
-  // C3: [21, 36],
-  // C4: [28, 48],
-  A4: [35, 57],
+  sharp: [-4, 7],
+  A4: [3, 3],
 
   durations: {
     '0.25': 'longa',
@@ -989,7 +1127,7 @@ module.exports = {
   }
 }
 
-},{}],11:[function(require,module,exports){
+},{}],14:[function(require,module,exports){
 var scientific = require('scientific-notation');
 var helmholtz = require('helmholtz');
 var knowledge = require('./knowledge');
@@ -1020,7 +1158,7 @@ Note.prototype = {
   },
 
   name: function() {
-    return knowledge.noteNames[this.coord[1] % 7];
+    return knowledge.fifths[this.coord[1] + knowledge.A4[1] - this.accidentalValue() * 7 + 1];
   },
 
   accidentalValue: function() {
@@ -1214,7 +1352,7 @@ Note.fromMIDI = function(note) {
 
 module.exports = Note;
 
-},{"./interval":9,"./knowledge":10,"./vector":14,"helmholtz":3,"scientific-notation":6}],12:[function(require,module,exports){
+},{"./interval":12,"./knowledge":13,"./vector":17,"helmholtz":6,"scientific-notation":9}],15:[function(require,module,exports){
 var knowledge = require('./knowledge');
 var Interval = require('./interval');
 
@@ -1324,7 +1462,7 @@ Scale.prototype = {
 
 module.exports = Scale;
 
-},{"./interval":9,"./knowledge":10}],13:[function(require,module,exports){
+},{"./interval":12,"./knowledge":13}],16:[function(require,module,exports){
 var knowledge = require('./knowledge');
 
 module.exports = function(teoria) {
@@ -1343,7 +1481,7 @@ module.exports = function(teoria) {
   }
 }
 
-},{"./knowledge":10}],14:[function(require,module,exports){
+},{"./knowledge":13}],17:[function(require,module,exports){
 module.exports = {
   add: function(note, interval) {
     return [note[0] + interval[0], note[1] + interval[1]];
@@ -1365,10 +1503,11 @@ module.exports = {
   }
 }
 
-},{}],15:[function(require,module,exports){
-var teoria = require('teoria');
+},{}],18:[function(require,module,exports){
+teoria = require('teoria');
+remus = require('../index.js');
 
-var obj1 = {
+obj1 = {
   type: "Song",
   duration: [8700, 'ms'],
   contents: [
@@ -1411,13 +1550,13 @@ $(document).ready(function() {
   testRender();
 });
 
-function testRender() {
-  realizeTime(obj1, [4, 180]);
+window.testRender = function() {
+  remus.realizeTime(obj1, [4, 180]);
   //document.getElementById("rendered").innerHTML = render2(obj1);
-  document.getElementById('rendered').innerHTML = '';
-  document.getElementById('rendered').appendChild(render3(obj1));
+  document.getElementById('rendered').innerHTML = 'ape';
+  document.getElementById('rendered').appendChild(remus.render(obj1));
 }
 
-window.teoria = teoria;
 
-},{"teoria":7}]},{},[15]);
+
+},{"../index.js":1,"teoria":10}]},{},[18]);
