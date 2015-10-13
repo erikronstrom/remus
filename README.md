@@ -11,32 +11,42 @@ Remus
 
 Three types of pitches are supported:
 
-* Absolute frequencies (in Hertz) OR Mel-ish/float MIDI note number
-* Tone-height category (number of units, usually semitones, above C0)
-* Structural pitch category, i.e. tones including "spelling" (F# ≠ Gb)
+* Exact tone-height (in *mmel* units, see below)
+* Tone-height category (in *tcu* above C0)
+* Structural pitch category, i.e. tones including “spelling” (F# ≠ Gb)
 
-Structural pitches are stored as [Intervals](# Interval) relative to C0
+Exact tone-height is measured in *mmel*, which is a floating-point number corresponding to MIDI note numbers. Examples (at concert pitch 440 Hz): 0.0 = C0 = 16.35 Hz, 69.0 = A4 = 440 Hz.
+
+Tone-height category is measured in *tcu* (Tone-height Category Units), which defaults to 24 per octave (quarter tones), but that may be overridden per song or even locally in e.g. a specific voice. Note that the default setting implies `midiNoteNumber = units / 2`. Note that tone-height category must be an integer. If higher resolution is needed, the pitch resolution should be changed, globally or locally.
+
+Structural pitch categories are stored as [Intervals](# Interval) relative to C0
 
 *(Possible extensions: pitch-class/chroma, i.e. tone-height without octave information, and corresponding tonal representation without octave)*
 
-Note that more than one of the pitch types can be simultanously present in the same Pitch object. For example, an imported MIDI file will only have tone-heights set, while tonal categorization data may be added later by some analysis process.
+**Note** that more than one of the pitch types can be simultaneously present in the same Pitch object. For example, an imported MIDI file will only have tone-heights set, while structural pitch categories may be added later by some analysis process.
 
 #### Additional data
 
-The tone-height and tonal representations can be complemented by a value for *pitch deviation* in cents.
+The tone-height and tonal representations can be complemented by a value for *pitch deviation* in cents. This is stored in the property `pitchDeviation`.
 
-Vibrato (min/max pitch)
-“Pitch envelope”
-Glissando
+#### TODO
+
+* Vibrato (min/max pitch)
+* “Pitch envelope”
+* Glissando
 
 #### Coercing
 
 In places where a pitch is expected, the following inputs can be coerced to a pitch (using Pitch.coerce):
 
-* Strings of tonal pitches in scientific notation (e.g. "Ab4" or "C3")
-* Strings of frequencies (e.g. "440 Hz")
-* Numbers, interpreted as tone-height
-* An [interval](# Interval), interpreted as relative to C0
+* Strings of structural pitch categories in scientific notation (e.g. "Ab4" or "C3")
+* Strings of frequencies (e.g. `"440 Hz"`), converted to *mmel*
+* Strings of exact pitches in tcu (e.g. `"69 mmel"`)
+* Strings of tone-height categories (e.g. `"136 tcu"`)
+* Integers, interpreted as tone-height category in *tcu*
+* Floating point numbers, interpreted as exact tone-height in *mmel*
+* An [Interval](# Interval) object, interpreted as relative to C0
+* A list of a number and a string, which is interpreted as `[value, unit]`. Valid units are `Hz`, `mmel` and `tcu`.
 * A list of two numbers, which is first coerced to an [interval](# Interval)
 
 #### Questions
@@ -49,7 +59,7 @@ In places where a pitch is expected, the following inputs can be coerced to a pi
 
 ### Interval
 
-Intervals are "qualified", i.e. they consist of a *quality* (perfect, major, minor, augmented, diminished) and a *value* (second, third, octave, etc).
+Intervals are “qualified”, i.e. they consist of a *quality* (perfect, major, minor, augmented, diminished) and a *value* (second, third, octave, etc).
 
 Internally, intervals are stored as arrays of two numbers: `[steps, semitones]`. A major second up (M2) represented by `[1, 2]`, because it means one diatonic step and two semitones up. A perfect fifth down is `[-4, -7]`.
 
@@ -59,7 +69,7 @@ Note that the first number has to be an integer, while the second number can be 
 
 Where an interval is expected, the following input formats are accepted and coerced to an interval:
 
-* Strings of shorthand notation ("m2" = minor second up, "d-5" = diminished fifth down)
+* Strings of shorthand notation (`"m2"` = minor second up, `"d-5"` = diminished fifth down)
 * Number. The quality is implicitly that of a major scale (i.e perfect/major for upwards intervals, and perfect/minor for downwards intervals)
 * A list of an integer and a number, as described above
 
@@ -113,7 +123,7 @@ TODO: tremolo – recurring events, or grouping events into “super-events” (
 
 ### NoteList
 
-A collection of simultanous [notes](# Note), sharing "horizontal" properties (such as timing and duration), but with different pitches and possibly other differing properties (such as velocity and articulation).
+A collection of simultaneous [notes](# Note), sharing “horizontal” properties (such as timing and duration), but with different pitches and possibly other differing properties (such as velocity and articulation).
 
 If a note in a NoteList specifies its own nominal position, it is ignored. Durations can differ, however.
 
@@ -136,7 +146,7 @@ Properties:
 * List of chord degrees
 * String representation (optional)
 
-Actual pitches is generally only present when the harmony originates from a performance. If a chord is chosen from a list or created from a text representation (such as "Cm7b5"), the list of actual pitches will be empty, unless it is filled in with some pre-defined or computed voicing.
+Actual pitches is generally only present when the harmony originates from a performance. If a chord is chosen from a list or created from a text representation (such as `"Cm7b5"`), the list of actual pitches will be empty, unless it is filled in with some pre-defined or computed voicing.
 
 #### Categories
 
@@ -146,7 +156,7 @@ Main category includes `major`, `minor`, `suspended-fourth`, `augmented`, `dimin
 
 The list of chord degrees is mainly redundant to the categorization, but enables the use of harmonies for which there are no pre-defined categories. While the list of supported categories could of course be extended, should the need arise, a category system can never contain all possible harmonies.
 
-Note that these chord degrees denote a "nominal harmony" rather than voicing. E.g. a 7sus4 chord would be represented as `[P4, P5, m7]`, even if the seventh was actually played in the octave below the fourth. Octave equivalence is generally assumed, with the exception that the intervals between octave and 13th can be used for tensions, as in common in Western harmonic systems.
+Note that these chord degrees denote a “nominal harmony” rather than voicing. E.g. a 7sus4 chord would be represented as `[P4, P5, m7]`, even if the seventh was actually played in the octave below the fourth. Octave equivalence is generally assumed, with the exception that the intervals between octave and 13th can be used for tensions, as in common in Western harmonic systems.
 
 The list contains of values that can be coerced to [Interval objects](# Interval). Note that microtonal intervals are supported.
 
@@ -159,13 +169,12 @@ This approach is limited to one version of each chord degree, (e.g. both perfect
 TODO: relation to tonal context?
 
 
-#### Questions
+#### Note
 
-* In MusicXML, unknown harmonies are accomplished by using the category `other`, and specifying all included chord degrees as *add* degrees. While this is perhaps not very elegant, it still makes it possible to represent arbitrary harmonies. A list of chord degrees could therefore be calculated instead of stored separetely, which would reduce redundancy. On the other hand a chord degree list is in many ways a "cleaner" solution than a cateogry-based representation, and it may be useful to specify the components of a harmony explicitly.
+In MusicXML, unknown harmonies are accomplished by using the category `other`, and specifying all included chord degrees as *add* degrees. While this is perhaps not very elegant, it still makes it possible to represent arbitrary harmonies. It could be argued that a list of chord degrees should be calculated instead of stored separately, since it would reduce redundancy. But a degree list is in many ways a “cleaner” solution than a category-based representation, and sometimes it is useful to specify the components of a harmony explicitly.
 
-  As an example, a 13th chord may or may not include the fifth, ninth and 11th. While the addition or subtraction of the fifth does not change the categorization of the chord as a 13th chord, it still changes the "color". The presence or absence of a perfect fifth may also be important in a tonal context where the fifth would otherwise be altered.
-  
-  (So, is a chord degree list motivated or not?) YES!
+As an example, a 13th chord may or may not include the fifth, ninth and 11th. While the addition or subtraction of the fifth does not change the categorization of the chord as a 13th chord, it still changes the "color". The presence or absence of a perfect fifth may also be important in a tonal context where the fifth would otherwise be altered.
+
 
 -------------
 
