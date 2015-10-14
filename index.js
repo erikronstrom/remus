@@ -1,24 +1,30 @@
 var Base = require('./lib/base.js');
 var Render = require('./lib/render.js');
 var Store = require('./lib/store.js');
-var teoria = require('teoria');
+
+var Interval = require('./lib/interval');
+var Pitch = require('./lib/pitch');
+var Duration = require('./lib/duration');
+var Chord = require('./lib/chord');
+var Note = require('./lib/note');
+knowledge = require('./lib/knowledge');
 
 var remus = {
   realizeTime: Base.realizeTime,
   render: Render.render,
   Store: Store,
   
-  Interval: teoria.Interval,
-  Pitch: teoria.Pitch,
-  Duration: teoria.Duration,
-  Note: teoria.Note,
-  Chord: teoria.Chord,
+  Interval: Interval,
+  Pitch: Pitch,
+  Duration: Duration,
+  Note: Note,
+  Chord: Chord,
   
-  interval: teoria.Interval.coerce,
-  pitch: teoria.Pitch.coerce,
-  duration: teoria.Duration.coerce,
-  note: teoria.Note.coerce,
-  chord: teoria.Chord.coerce
+  interval: Interval.coerce,
+  pitch: Pitch.coerce,
+  duration: Duration.coerce,
+  note: Note.coerce,
+  chord: Chord.coerce
 };
 
 exports = module.exports = remus;
