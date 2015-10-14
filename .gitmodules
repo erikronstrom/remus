@@ -16,9 +16,6 @@
 [submodule "node_modules/scientific-notation"]
 	path = node_modules/scientific-notation
 	url = git@github.com:erikronstrom/scientific-notation.git
-[submodule "node_modules/teoria"]
-	path = node_modules/teoria
-	url = git@github.com:erikronstrom/teoria.git
 [submodule "node_modules/daccord"]
 	path = node_modules/daccord
 	url = git@github.com:erikronstrom/daccord.git
