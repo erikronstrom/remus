@@ -63,9 +63,9 @@
           "meta": [], // possibility to override time, key, etc
           "sound": "keyboard.piano.grand",
           "contents": [
-            {"type": "Note", "pitch": 65, "position": [50, "ms"], "duration": [437, "ms"]},
-            {"type": "Note", "pitch": 64, "position": [250, "ms"], "duration": [437, "ms"]},
-            {"type": "Note", "pitch": 65, "position": [530, "ms"], "duration": [437, "ms"]},
+            {"type": "Note", "pitch": 65, "position": [50, "ms"], "duration": [200, "ms"]},
+            {"type": "Note", "pitch": 64, "position": [250, "ms"], "duration": [280, "ms"]},
+            {"type": "Note", "pitch": 65, "position": [530, "ms"], "duration": [1000, "ms"]},
             {"type": "Note", "pitch": 67, "position": [800, "ms"], "duration": [437, "ms"]},
             {"type": "Note", "pitch": 65, "position": [1245, "ms"], "duration": [437, "ms"]},
             {"type": "Note", "pitch": 64, "position": [1530, "ms"], "duration": [437, "ms"]},
