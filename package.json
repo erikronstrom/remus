@@ -1,0 +1,29 @@
+{
+  "name": "remus",
+  "version": "0.0.1",
+  "description": "Generalized music representation",
+  "main": "index.js",
+  "scripts": {
+    "test": "tape test/*.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/erikronstrom/remus"
+  },
+  "keywords": [
+    "remus",
+    "chord",
+    "music",
+    "teoria"
+  ],
+  "author": {
+    "name": "Erik Ronström",
+    "email": "erik.ronstrom@doremir.com"
+  },
+  "devDependencies": {
+    "tape": "^2.13.3"
+  },
+  "dependencies": {
+    "lodash.get": "^3.7.0"
+  }
+}
