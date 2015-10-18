@@ -1,3 +1,4 @@
+"use strict";
 var Base = require('./lib/base.js');
 var Render = require('./lib/render.js');
 var Store = require('./lib/store.js');
