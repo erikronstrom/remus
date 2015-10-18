@@ -9,23 +9,13 @@ var Harmony = require('./lib/harmony');
 var Chord = require('./lib/chord');
 var ChordSequence = require('./lib/chord-sequence');
 var Note = require('./lib/note');
-knowledge = require('./lib/knowledge');
+var Voice = require('./lib/voice');
+var VerticalContainer = require('./lib/vertical-container');
+var Song = require('./lib/song');
+
+var knowledge = require('./lib/knowledge');
 
 Store.typeMap = {
-  Interval: Interval,
-  Pitch: Pitch,
-  Duration: Duration,
-  Harmony: Harmony,
-  Chord: Chord,
-  ChordSequence: ChordSequence,
-  Note: Note
-}
-
-var remus = {
-  realizeTime: Base.realizeTime,
-  render: Render.render,
-  Store: Store,
-  
   Interval: Interval,
   Pitch: Pitch,
   Duration: Duration,
@@ -33,14 +23,37 @@ var remus = {
   Harmony: Harmony,
   Chord: Chord,
   ChordSequence: ChordSequence,
-  
+  Voice: Voice,
+  VerticalContainer: VerticalContainer,
+  Song: Song
+};
+
+var remus = {
+  realizeTime: Base.realizeTime,
+  render: Render.render,
+  Store: Store,
+
+  Interval: Interval,
+  Pitch: Pitch,
+  Duration: Duration,
+  Note: Note,
+  Harmony: Harmony,
+  Chord: Chord,
+  ChordSequence: ChordSequence,
+  Voice: Voice,
+  VerticalContainer: VerticalContainer,
+  Song: Song,
+
   interval: Interval.coerce,
   pitch: Pitch.coerce,
   duration: Duration.coerce,
   note: Note.coerce,
   harmony: Harmony.coerce,
   chord: Chord.coerce,
-  chordSequence: ChordSequence.coerce
+  chordSequence: ChordSequence.coerce,
+  voice: Voice.coerce,
+  verticalContainer: VerticalContainer.coerce,
+  song: Song.coerce
 };
 
 exports = module.exports = remus;
